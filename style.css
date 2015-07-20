@@ -1,0 +1,52 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: #999;
+}
+
+body, #starting-screen, #board {
+	height: 100%;
+	text-align: center;
+}
+
+#wrapper {
+	margin: auto;
+	background: #ddd;
+}
+
+#starting-screen > h2 {
+	padding: 5%;
+}
+
+#start-button, #message {
+	padding: 2%;
+	margin: 10% 30%;
+	background: #798;
+}
+
+#ai-hand, #player-hand {
+	height: 24%;
+	background: #fff;
+}
+
+#decks, #table {
+	display: inline-block;
+	height: 48%;
+	margin: 1% auto 0.5%;
+	background: #abc;
+}
+
+#decks {
+	width: 10%;
+}
+
+#table {
+	width: 82%;
+}
+
+#ai-zone, #player-zone {
+	height: 46%;
+}
