@@ -58,8 +58,17 @@ var Deck = function() {
 	}
 }
 
-Deck.prototype.drawCards = function(n) {
+Deck.prototype.drawCards = function(n, turn) {
 
+	var card = document.createElement("div");
+
+	if(turn) {
+		get("p-hand").appendChild(card);
+	} else {
+		get("ai-hand").appendChild(card);
+	}
+
+	card.className = "card";
 }
 
 //player object
@@ -113,10 +122,10 @@ var init = function() {
 		ai.deck = new Deck();
 
 		if(turn) {
-			player.deck.drawCards(startingCards);
+			player.deck.drawCards(startingCards, turn);
 			ai.deck.drawCards(startingCards + 1);
 		} else {
-			player.deck.drawCards(startingCards + 1);
+			player.deck.drawCards(startingCards + 1, turn);
 			ai.deck.drawCards(startingCards);
 		}
 
@@ -136,10 +145,10 @@ var init = function() {
 		count = 0;
 
 		if(turn) {
-			player.deck.drawCards(1);
+			player.deck.drawCards(1, turn);
 			player.makeMove();
 		} else {
-			ai.deck.drawCards(1);
+			ai.deck.drawCards(1, turn);
 			ai.makeMove();
 		}
 

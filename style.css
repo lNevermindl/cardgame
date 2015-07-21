@@ -1,15 +1,17 @@
 * {
 	margin: 0;
 	padding: 0;
+	/*fix*/
+	/*font-size: 0;*/
 }
 
 body {
 	background: #999;
+	text-align: center;
 }
 
 body, #starting-screen, #board {
 	height: 100%;
-	text-align: center;
 }
 
 #wrapper {
@@ -28,32 +30,42 @@ body, #starting-screen, #board {
 }
 
 .bar {
-	height: 24%;
+	height: 28%;
 	background: #acf;
+	/*fix*/
+	/*display: -webkit-flex;*/
 }
 
-#ai-deck, #p-deck, #ai-hand, #p-hand {
+.bar > div {
 	display: inline-block;
-	margin: 1%;
-	height: 94%;
+	/*margin: 0.36% auto;*/
+	height: 100%;
 	background: #fff;
 }
 
 #bonuses, #table {
 	display: inline-block;
-	height: 48%;
-	margin: 1% auto 0.5%;
+	height: 40.4%;
+	border: 0.1em solid black;
+	margin: 0.4em auto 0.16em;
 	background: #abc;
 }
 
-#bonuses {
+.col-1 {
 	width: 10%;
 }
 
-#table {
-	width: 82%;
+.col-2 {
+	width: 88%;
 }
 
 #ai-zone, #p-zone {
 	height: 46%;
+}
+
+.card {
+	display: inline-block;
+	height: 100%;
+	width: 10%;
+	background: #987;
 }
