@@ -27,19 +27,26 @@ body, #starting-screen, #board {
 	background: #798;
 }
 
-#ai-hand, #player-hand {
+.bar {
 	height: 24%;
+	background: #acf;
+}
+
+#ai-deck, #p-deck, #ai-hand, #p-hand {
+	display: inline-block;
+	margin: 1%;
+	height: 94%;
 	background: #fff;
 }
 
-#decks, #table {
+#bonuses, #table {
 	display: inline-block;
 	height: 48%;
 	margin: 1% auto 0.5%;
 	background: #abc;
 }
 
-#decks {
+#bonuses {
 	width: 10%;
 }
 
@@ -47,6 +54,6 @@ body, #starting-screen, #board {
 	width: 82%;
 }
 
-#ai-zone, #player-zone {
+#ai-zone, #p-zone {
 	height: 46%;
 }

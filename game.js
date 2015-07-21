@@ -30,23 +30,23 @@ var	scale, turn, timer, count,
 	playerHealth = 30,
 	startingCards = 4,
 	collection = [
-		{name: "test1", atk: 3, hp: 2},
-		{name: "test2", atk: 3, hp: 2},
-		{name: "test3", atk: 3, hp: 2},
-		{name: "test4", atk: 3, hp: 2},
-		{name: "test5", atk: 3, hp: 2},
-		{name: "test6", atk: 3, hp: 2},
-		{name: "test7", atk: 3, hp: 2},
-		{name: "test8", atk: 3, hp: 2},
-		{name: "test9", atk: 3, hp: 2},
-		{name: "test10", atk: 3, hp: 2}
+		{name: "test1", pow: 1, el: "water"},
+		{name: "test2", pow: 2, el: "fire"},
+		{name: "test3", pow: 3, el: "nature"},
+		{name: "test4", pow: 4, el: "water"},
+		{name: "test5", pow: 5, el: "fire"},
+		{name: "test6", pow: 6, el: "nature"},
+		{name: "test7", pow: 7, el: "water"},
+		{name: "test8", pow: 8, el: "fire"},
+		{name: "test9", pow: 9, el: "nature"},
+		{name: "test10", pow: 10, el: "water"}
 	];
 
 //card constructor
 var Card = function(cardObj) {
 	this.name = cardObj.name;
-	this.atk = cardObj.atk;
-	this.hp = cardObj.hp;
+	this.pow = cardObj.pow;
+	this.el = cardObj.el;
 }
 
 //deck constructor
