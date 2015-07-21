@@ -60,15 +60,18 @@ var Deck = function() {
 
 Deck.prototype.drawCards = function(n, turn) {
 
-	var card = document.createElement("div");
+	for(var i = 0; i < n; i++) {
 
-	if(turn) {
-		get("p-hand").appendChild(card);
-	} else {
-		get("ai-hand").appendChild(card);
+		var card = document.createElement("div");
+
+		if(turn) {
+			get("p-hand").appendChild(card);
+		} else {
+			get("ai-hand").appendChild(card);
+		}
+
+		card.className = "card";
 	}
-
-	card.className = "card";
 }
 
 //player object
@@ -112,8 +115,7 @@ var init = function() {
 
 		//launch game
 		turn = Math.round(Math.random());
-		console.log(turn);
-		console.log(!!turn);
+		console.log("Turn: " + turn);
 
 		player.health = playerHealth;
 		ai.health = playerHealth;
@@ -123,10 +125,10 @@ var init = function() {
 
 		if(turn) {
 			player.deck.drawCards(startingCards, turn);
-			ai.deck.drawCards(startingCards + 1);
+			ai.deck.drawCards(startingCards + 1, !turn);
 		} else {
-			player.deck.drawCards(startingCards + 1, turn);
-			ai.deck.drawCards(startingCards);
+			player.deck.drawCards(startingCards + 1, !turn);
+			ai.deck.drawCards(startingCards, turn);
 		}
 
 		timer = setInterval(function() {
@@ -142,6 +144,9 @@ var init = function() {
 
 	move = function() {
 		//game turn
+
+		console.log("Next turn: " + turn);
+
 		count = 0;
 
 		if(turn) {
@@ -153,7 +158,6 @@ var init = function() {
 		}
 
 		turn = !turn;
-		console.log(turn);
 
 		//end game
 		if(player.health <= 0) {
