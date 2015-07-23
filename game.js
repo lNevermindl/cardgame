@@ -28,25 +28,27 @@ var	scale, turn, timer, count,
 	timeLimit = 30;
 	deckSize = 10,
 	playerHealth = 30,
-	startingCards = 4,
+	startingCards = 3,
 	collection = [
-		{name: "test1", pow: 1, el: "water"},
-		{name: "test2", pow: 2, el: "fire"},
-		{name: "test3", pow: 3, el: "nature"},
-		{name: "test4", pow: 4, el: "water"},
-		{name: "test5", pow: 5, el: "fire"},
-		{name: "test6", pow: 6, el: "nature"},
-		{name: "test7", pow: 7, el: "water"},
-		{name: "test8", pow: 8, el: "fire"},
-		{name: "test9", pow: 9, el: "nature"},
-		{name: "test10", pow: 10, el: "water"}
+		{name: "water-1", pow: 1, el: "water"},
+		{name: "water-2", pow: 2, el: "water"},
+		{name: "water-3", pow: 3, el: "water"},
+		{name: "water-4", pow: 4, el: "water"},
+		{name: "fire-1", pow: 1, el: "fire"},
+		{name: "fire-2", pow: 2, el: "fire"},
+		{name: "fire-3", pow: 3, el: "fire"},
+		{name: "fire-4", pow: 4, el: "fire"},
+		{name: "nature-1", pow: 1, el: "nature"},
+		{name: "nature-2", pow: 2, el: "nature"},
+		{name: "nature-3", pow: 3, el: "nature"},
+		{name: "nature-4", pow: 4, el: "nature"}
 	];
 
 //card constructor
-var Card = function(cardObj) {
-	this.name = cardObj.name;
-	this.pow = cardObj.pow;
-	this.el = cardObj.el;
+var Card = function(cardData) {
+	this.name = cardData.name;
+	this.pow = cardData.pow;
+	this.el = cardData.el;
 }
 
 //deck constructor
@@ -62,15 +64,33 @@ Deck.prototype.drawCards = function(n, turn) {
 
 	for(var i = 0; i < n; i++) {
 
-		var card = document.createElement("div");
+		var cardObj = this.cards.splice(0, 1)[0];
 
-		if(turn) {
-			get("p-hand").appendChild(card);
+		if(cardObj) {
+
+			var card = document.createElement("div"),
+				name = document.createElement("div"),
+				pow = document.createElement("div"),
+				img = document.createElement("img");
+
+				img.src = "Placeholder.jpg";
+				name.innerHTML = cardObj.name;
+				pow.innerHTML = cardObj.pow;
+
+			if(turn) {
+				get("p-hand").appendChild(card);
+			} else {
+				get("ai-hand").appendChild(card);
+			}
+
+			card.className = "card";
+			card.appendChild(img);
+			card.appendChild(name);
+			card.appendChild(pow);
+
 		} else {
-			get("ai-hand").appendChild(card);
+			console.log("Out of cards!");
 		}
-
-		card.className = "card";
 	}
 }
 
