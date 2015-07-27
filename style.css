@@ -53,8 +53,8 @@ body, #starting-screen, #board {
 
 #table {
 	float: left;
-	width: 68.2%;
-	margin-left: 1%;
+	width: 69.7%;
+	margin-left: 0.5%;
 	border-radius: 3px;
 	overflow: hidden;
 }
@@ -67,7 +67,7 @@ body, #starting-screen, #board {
 
 .col-1 {
 	float: left;
-	margin-left: 1%;
+	margin-left: 0.5%;
 	width: 9.6%;
 }
 
@@ -127,16 +127,26 @@ body, #starting-screen, #board {
 	border-radius: 3px;
 }
 
+.card > div:nth-child(2) {
+	height: 16%;
+}
+
+.card > div:nth-child(4) {
+	padding: 6% 22% 0 0;
+	float: right;
+	height: 20%;
+}
+
 .card > div + img {
 	float: left;
 	margin-left: 12%;
-	height: 14%;
+	height: 20%;
 }
 
 .mask {
 	clear: both;
 	position: relative;
-	top: -92%;
+	top: -96%;
 	height: 100%;
-	background: rgba(100, 0, 0, 0.6);
+	/*background: rgba(100, 0, 0, 0.6);*/
 }
