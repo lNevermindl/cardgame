@@ -18,8 +18,6 @@ body, #starting-screen, #board {
 #wrapper {
 	margin: auto;
 	/*background: #384240;*/
-	border-radius: 3px;
-	overflow: hidden;
 }
 
 #starting-screen > h2 {
@@ -40,6 +38,7 @@ body, #starting-screen, #board {
 	height: 26%;
 	padding: 0.5% 0;
 	background: #868C89;
+	border-radius: 3px;
 }
 
 .bar > div {
@@ -54,7 +53,7 @@ body, #starting-screen, #board {
 
 #table {
 	float: left;
-	width: 66.2%;
+	width: 68.2%;
 	margin-left: 1%;
 	border-radius: 3px;
 	overflow: hidden;
@@ -70,6 +69,10 @@ body, #starting-screen, #board {
 	float: left;
 	margin-left: 1%;
 	width: 9.6%;
+}
+
+#bonuses {
+	margin-left: 0;
 }
 
 .col-2 {
@@ -101,10 +104,11 @@ body, #starting-screen, #board {
 
 .card {
 	display: inline-block;
+	font-size: 0.8em;
 	margin: 0 0.5%;
 	height: 100%;
 	width: 9.2%;
-	background: #DBD092;
+	background: #EFEEEC;
 	vertical-align: top;
 	border-radius: 3px;
 	transition: 0.3s;
@@ -120,4 +124,19 @@ body, #starting-screen, #board {
 .card > img {
 	height: 50%;
 	margin-top: 5%;
+	border-radius: 3px;
+}
+
+.card > div + img {
+	float: left;
+	margin-left: 12%;
+	height: 14%;
+}
+
+.mask {
+	clear: both;
+	position: relative;
+	top: -92%;
+	height: 100%;
+	background: rgba(100, 0, 0, 0.6);
 }

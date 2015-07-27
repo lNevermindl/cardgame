@@ -8,24 +8,28 @@ var get = function(id) {
 	//cross-browser events
 	addEvent = function(element, event, handler) {
 
-		if(window.addEventListener) {
+		if (window.addEventListener) {
             element.addEventListener(event, handler, false);
-        } else if(window.attachEvent) {
+        } else if (window.attachEvent) {
             element.attachEvent(event, handler);
         }
 	},
 
 	removeEvent = function(element, event, handler) {
-		if(window.addEventListener) {
+		if (window.addEventListener) {
             element.removeEventListener(event, handler, false);
-        } else if(window.attachEvent) {
+        } else if (window.attachEvent) {
             element.detachEvent(event, handler);
         }
+	},
+
+	prevent = function(e) {
+		event.preventDefault ? event.preventDefault() : (event.returnValue = false);
 	};
 
 //global variables
 var	scale, turn, timer, count,
-	timeLimit = 30;
+	timeLimit = 20;
 	deckSize = 10,
 	playerHealth = 30,
 	startingCards = 3,
@@ -54,43 +58,72 @@ var Card = function(cardData) {
 //deck constructor
 var Deck = function() {
 	this.cards = [];
+	this.inHand = [];
+	this.onTable = [];
 
-	for(var i = 0; i < deckSize; i++) {
+	for (var i = 0; i < deckSize; i++) {
 		this.cards[i] = new Card(collection[(Math.floor(Math.random()*collection.length))]);
 	}
 }
 
 Deck.prototype.drawCards = function(n, turn) {
 
-	for(var i = 0; i < n; i++) {
+	for (var i = 0; i < n; i++) {
 
-		var cardObj = this.cards.splice(0, 1)[0];
+		if (this.inHand.length < 8) {
 
-		if(cardObj) {
+			var cardObj = this.cards.splice(0, 1)[0];
 
-			var card = document.createElement("div"),
-				name = document.createElement("div"),
-				pow = document.createElement("div"),
-				img = document.createElement("img");
+			if (cardObj) {
+
+				var card = document.createElement("div"),
+					img = document.createElement("img"),
+					name = document.createElement("div"),
+					pow = document.createElement("div"),
+					el = document.createElement("img"),
+					mask = document.createElement("div");
 
 				img.src = "Placeholder.jpg";
 				name.innerHTML = cardObj.name;
 				pow.innerHTML = cardObj.pow;
 
-			if(turn) {
-				get("p-hand").appendChild(card);
+				switch (cardObj.el) {
+					case "water":
+						el.src = "Placeholder.jpg";
+						break;
+					case "fire":
+						el.src = "Placeholder.jpg";
+						break;
+					case "nature":
+						el.src = "Placeholder.jpg";
+						break;
+				}
+
+				if (turn) {
+					get("p-hand").appendChild(card);
+				} else {
+					get("ai-hand").appendChild(card);
+				}
+
+				card.className = "card";
+				card.appendChild(img);
+				card.appendChild(name);
+				card.appendChild(el);
+				card.appendChild(pow);
+				card.appendChild(mask);
+				mask.className = "mask";
+
+				card.el = cardObj.el;
+				card.pow = pow;
+				this.inHand.push(card);
+
 			} else {
-				get("ai-hand").appendChild(card);
+				console.log("Out of cards!");
 			}
 
-			card.className = "card";
-			card.appendChild(img);
-			card.appendChild(name);
-			card.appendChild(pow);
-
 		} else {
-			console.log("Out of cards!");
-		}
+			console.log("Can't hold more than 8 cards in hand!");
+		};
 	}
 }
 
@@ -98,7 +131,12 @@ Deck.prototype.drawCards = function(n, turn) {
 var player = {
 	makeMove: function() {
 
-		//move();
+		for (var i = 0; i < this.deck.inHand.length; i++) {
+			addEvent(this.deck.inHand[i], "mousedown", drag);
+		}
+
+		addEvent(get("next-turn"), "click", move);
+
 	}
 };
 
@@ -143,7 +181,7 @@ var init = function() {
 		player.deck = new Deck();
 		ai.deck = new Deck();
 
-		if(turn) {
+		if (turn) {
 			player.deck.drawCards(startingCards, turn);
 			ai.deck.drawCards(startingCards + 1, !turn);
 		} else {
@@ -153,7 +191,7 @@ var init = function() {
 
 		timer = setInterval(function() {
 			count++;
-			if(count >= timeLimit){
+			if (count >= timeLimit){
 				move();
 			}
 			console.log(count);
@@ -166,10 +204,10 @@ var init = function() {
 		//game turn
 
 		console.log("Next turn: " + turn);
-
+		removeEvent(get("next-turn"), "click", move);
 		count = 0;
 
-		if(turn) {
+		if (turn) {
 			player.deck.drawCards(1, turn);
 			player.makeMove();
 		} else {
@@ -180,9 +218,9 @@ var init = function() {
 		turn = !turn;
 
 		//end game
-		if(player.health <= 0) {
+		if (player.health <= 0) {
 			end("You lose!/nClick to continue.");
-		} else if(ai.health <= 0) {
+		} else if (ai.health <= 0) {
 			end("You win!/nClick to continue.");
 		}
 	},
@@ -197,15 +235,56 @@ var init = function() {
 
 //additional functions
 var fitScale = function() {
-	scale = window.innerWidth;
-	document.body.style.fontSize = scale * 0.02 + "px";
-	get("wrapper").style.width = scale * 0.98 + "px";
-	get("wrapper").style.height = scale * 0.46 + "px";
-	get("wrapper").style.marginTop = (window.innerHeight - scale * 0.46) / 2 + "px";
-	console.log("resized");
-}
+		scale = window.innerWidth;
+		document.body.style.fontSize = scale * 0.02 + "px";
+		get("wrapper").style.width = scale * 0.98 + "px";
+		get("wrapper").style.height = scale * 0.46 + "px";
+		get("wrapper").style.marginTop = (window.innerHeight - scale * 0.46) / 2 + "px";
+		console.log("resized");
+	},
+
+	drag = function(e) {
+
+		console.log("drag started");
+
+		var card = e.target.parentNode;
+
+		console.log(card);
+
+		var moveCard = function() {
+
+			console.log("moveCard started");
+
+
+
+			addEvent(document, "mouseup", drop);
+
+			},
+
+			drop = function() {
+
+				console.log("drop started");
+
+				get("p-zone").appendChild(card);
+				card.style.position = "";
+
+				removeEvent(document, "mousemove", moveCard);
+				removeEvent(document, "mouseup", drop);
+				removeEvent(card, "mousedown", drag);
+			};
+
+		card.style.height =	getComputedStyle(card).height/2 + "px";
+		card.style.width =	getComputedStyle(card).width/2 + "px";
+		card.style.position = "absolute";
+
+		addEvent(document, "mousemove", moveCard);
+	};
 
 //run
 addEvent(window, "load", init);
+addEvent(window, "click", prevent);
+addEvent(window, "mousedown", prevent);
+addEvent(window, "mouseup", prevent);
+addEvent(window, "contextmenu", prevent);
 
 })();
