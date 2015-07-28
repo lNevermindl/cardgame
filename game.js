@@ -99,22 +99,24 @@ Deck.prototype.drawCards = function(n, turn) {
 						break;
 				}
 
-				if (turn) {
-					get("p-hand").appendChild(card);
-				} else {
-					get("ai-hand").appendChild(card);
-				}
-
-				card.className = "card";
 				card.appendChild(img);
 				card.appendChild(name);
 				card.appendChild(el);
 				card.appendChild(pow);
 				card.appendChild(mask);
+				card.className = "card";
 				mask.className = "mask";
+
+				if (turn) {
+					get("p-hand").appendChild(card);
+					addEvent(mask, "mouseover", zoom);
+				} else {
+					get("ai-hand").appendChild(card);
+				}
 
 				card.el = cardObj.el;
 				card.pow = pow;
+				card.mask = mask
 				this.inHand.push(card);
 
 			} else {
@@ -144,7 +146,12 @@ var player = {
 var ai = {
 	makeMove: function() {
 
-		//move();
+		setTimeout(function() {
+
+			get("ai-zone").appendChild(ai.deck.inHand.splice(0, 1)[0]);
+			move();
+
+		}, 500);
 	}
 };
 
@@ -170,6 +177,8 @@ var init = function() {
 		//show game interface
 		get("starting-screen").style.display = "none"
 		get("board").style.display = "block"
+
+		addEvent(get("tip"), "click", function() {turn = true; move(); console.log("now it's your turn")});
 
 		//launch game
 		turn = Math.round(Math.random());
@@ -243,21 +252,25 @@ var fitScale = function() {
 		console.log("resized");
 	},
 
+	zoom = function(e) {
+		e.target.parentNode.className += " card-zoomed";
+		addEvent(e.target, "mouseout", function(e) {e.target.parentNode.className = "card"});
+	},
+
 	drag = function(e) {
 
 		console.log("drag started");
 
-		var card = e.target.parentNode;
+		var card = e.target.parentNode,
+			initHeight,
+			initWidth;
 
-		console.log(card);
-
-		var moveCard = function() {
+		var moveCard = function(e) {
 
 			console.log("moveCard started");
 
-
-
-			addEvent(document, "mouseup", drop);
+			card.style.top = e.clientY - initHeight/2 + "px";
+			card.style.left = e.clientX - initWidth/2 + "px";
 
 			},
 
@@ -266,18 +279,34 @@ var fitScale = function() {
 				console.log("drop started");
 
 				get("p-zone").appendChild(card);
+				card.style.height = "";
+				card.style.width = "";
 				card.style.position = "";
+				card.style.fontSize = "";
 
 				removeEvent(document, "mousemove", moveCard);
 				removeEvent(document, "mouseup", drop);
 				removeEvent(card, "mousedown", drag);
 			};
 
-		card.style.height =	getComputedStyle(card).height/2 + "px";
-		card.style.width =	getComputedStyle(card).width/2 + "px";
+		initHeight = parseInt(getComputedStyle(card).height);
+		initWidth = parseInt(getComputedStyle(card).width);
+
+		removeEvent(e.target, "mouseover", zoom);
+		removeEvent(e.target, "mouseout", function(e) {e.target.parentNode.className = "card"});
+		
+		card.className = "card";
+		card.style.height =	initHeight + "px";
+		card.style.width =	initWidth + "px";
+		card.style.fontSize = "2em";
+		moveCard(e);
+		console.log(getComputedStyle(card).height);
+
 		card.style.position = "absolute";
+		card.style.transition = "0s";
 
 		addEvent(document, "mousemove", moveCard);
+		addEvent(document, "mouseup", drop);
 	};
 
 //run
@@ -285,6 +314,6 @@ addEvent(window, "load", init);
 addEvent(window, "click", prevent);
 addEvent(window, "mousedown", prevent);
 addEvent(window, "mouseup", prevent);
-addEvent(window, "contextmenu", prevent);
+//addEvent(window, "contextmenu", prevent);
 
 })();

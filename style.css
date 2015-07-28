@@ -95,6 +95,13 @@ body, #starting-screen, #board {
 	
 }
 
+#heroes img + div {
+	position: relative;
+	width: 50%;
+	top: -50%;
+	font-size: 1.8em;
+}
+
 #tip > div, #next-turn > div {
 	height: 28%;
 	color: #FCD458;
@@ -112,9 +119,41 @@ body, #starting-screen, #board {
 	vertical-align: top;
 	border-radius: 3px;
 	transition: 0.3s;
+	overflow: hidden;
 }
 
-#p-hand > .card:hover {
+#p-deck > .card, #ai-deck > .card {
+	width: 83%;
+	background: #384240;
+}
+
+#table .card {
+	width: 20%;
+}
+
+#table .card > img {
+	float: left;
+	height: 85%;
+	margin: 5%;
+}
+
+#table .card > div:nth-child(2) {
+	display: none;
+}
+
+#table .card > div + img {
+	height: 42%;
+	margin-left: 0;
+}
+
+#table .card > div:nth-child(4) {
+	padding: 0 8%;
+	float: left;
+	height: 20%;
+	font-size: 1.8em;
+}
+
+.card-zoomed {
 	height: 200%;
 	width: 18.4%;
 	margin-top: -14%;
@@ -149,4 +188,8 @@ body, #starting-screen, #board {
 	top: -96%;
 	height: 100%;
 	/*background: rgba(100, 0, 0, 0.6);*/
+}
+
+#ai-hand .mask {
+	background: #384240;
 }
