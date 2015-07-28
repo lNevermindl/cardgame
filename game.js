@@ -83,21 +83,10 @@ Deck.prototype.drawCards = function(n, turn) {
 					el = document.createElement("img"),
 					mask = document.createElement("div");
 
-				img.src = "Placeholder.jpg";
+				img.src = "images/" + cardObj.el + "Elemental.png";
+				el.src = "images/" + cardObj.el + ".png";
 				name.innerHTML = cardObj.name;
 				pow.innerHTML = cardObj.pow;
-
-				switch (cardObj.el) {
-					case "water":
-						el.src = "Placeholder.jpg";
-						break;
-					case "fire":
-						el.src = "Placeholder.jpg";
-						break;
-					case "nature":
-						el.src = "Placeholder.jpg";
-						break;
-				}
 
 				card.appendChild(img);
 				card.appendChild(name);
@@ -219,9 +208,11 @@ var init = function() {
 		if (turn) {
 			player.deck.drawCards(1, turn);
 			player.makeMove();
+			get("tip").childNodes[0].innerHTML = "Your turn";
 		} else {
 			ai.deck.drawCards(1, turn);
 			ai.makeMove();
+			get("tip").childNodes[0].innerHTML = "AI turn";
 		}
 
 		turn = !turn;
@@ -295,6 +286,7 @@ var fitScale = function() {
 		removeEvent(e.target, "mouseover", zoom);
 		removeEvent(e.target, "mouseout", function(e) {e.target.parentNode.className = "card"});
 		
+		card.style.transition = "0s";
 		card.className = "card";
 		card.style.height =	initHeight + "px";
 		card.style.width =	initWidth + "px";

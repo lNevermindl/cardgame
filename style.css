@@ -13,6 +13,7 @@ body {
 
 body, #starting-screen, #board {
 	height: 100%;
+	overflow: hidden;
 }
 
 #wrapper {
@@ -96,6 +97,7 @@ body, #starting-screen, #board {
 }
 
 #heroes img + div {
+	color: #FCD458;
 	position: relative;
 	width: 50%;
 	top: -50%;
