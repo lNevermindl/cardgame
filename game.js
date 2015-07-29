@@ -1,5 +1,26 @@
 ;(function(){
 
+//global variables
+var	scale, turn, timer, count,
+	timeLimit = 20;
+	deckSize = 20,
+	playerHealth = 30,
+	startingCards = 3,
+	collection = [
+		{name: "water-1", pow: 1, el: "water"},
+		{name: "water-2", pow: 2, el: "water"},
+		{name: "water-3", pow: 3, el: "water"},
+		{name: "water-4", pow: 4, el: "water"},
+		{name: "fire-1", pow: 1, el: "fire"},
+		{name: "fire-2", pow: 2, el: "fire"},
+		{name: "fire-3", pow: 3, el: "fire"},
+		{name: "fire-4", pow: 4, el: "fire"},
+		{name: "nature-1", pow: 1, el: "nature"},
+		{name: "nature-2", pow: 2, el: "nature"},
+		{name: "nature-3", pow: 3, el: "nature"},
+		{name: "nature-4", pow: 4, el: "nature"}
+	];
+
 //basic functions
 var get = function(id) {
 		return document.getElementById(id);
@@ -26,27 +47,6 @@ var get = function(id) {
 	prevent = function(e) {
 		event.preventDefault ? event.preventDefault() : (event.returnValue = false);
 	};
-
-//global variables
-var	scale, turn, timer, count,
-	timeLimit = 20;
-	deckSize = 10,
-	playerHealth = 30,
-	startingCards = 3,
-	collection = [
-		{name: "water-1", pow: 1, el: "water"},
-		{name: "water-2", pow: 2, el: "water"},
-		{name: "water-3", pow: 3, el: "water"},
-		{name: "water-4", pow: 4, el: "water"},
-		{name: "fire-1", pow: 1, el: "fire"},
-		{name: "fire-2", pow: 2, el: "fire"},
-		{name: "fire-3", pow: 3, el: "fire"},
-		{name: "fire-4", pow: 4, el: "fire"},
-		{name: "nature-1", pow: 1, el: "nature"},
-		{name: "nature-2", pow: 2, el: "nature"},
-		{name: "nature-3", pow: 3, el: "nature"},
-		{name: "nature-4", pow: 4, el: "nature"}
-	];
 
 //card constructor
 var Card = function(cardData) {
@@ -122,13 +122,18 @@ Deck.prototype.drawCards = function(n, turn) {
 var player = {
 	makeMove: function() {
 
-		for (var i = 0; i < this.deck.inHand.length; i++) {
-			addEvent(this.deck.inHand[i], "mousedown", drag);
-		}
+		this.deck.inHand.forEach(function(card) {
+			addEvent(card, "mousedown", drag);
+		});
+
+		this.deck.onTable.forEach(function(card) {
+			addEvent(card, "mousedown", attack);
+		});
 
 		addEvent(get("next-turn"), "click", move);
 
-	}
+	},
+
 };
 
 //ai object
@@ -137,10 +142,24 @@ var ai = {
 
 		setTimeout(function() {
 
-			get("ai-zone").appendChild(ai.deck.inHand.splice(0, 1)[0]);
+			for (i = 0; i < (Math.random()*2); i++) {
+
+				if (ai.deck.inHand.length > 0 && ai.deck.onTable.length < 4) {
+
+					var card = ai.deck.inHand.splice(0, 1)[0];
+
+					get("ai-zone").appendChild(card);
+					ai.deck.onTable.push(ai.deck.inHand.splice(ai.deck.inHand.indexOf(card), 1)[0]);
+
+				} else {
+					console.log("Can't put more than 4 cards on the table");
+				}
+
+			}
+
 			move();
 
-		}, 500);
+		}, 1000);
 	}
 };
 
@@ -202,7 +221,8 @@ var init = function() {
 		//game turn
 
 		console.log("Next turn: " + turn);
-		removeEvent(get("next-turn"), "click", move);
+
+		blockPlayer();
 		count = 0;
 
 		if (turn) {
@@ -265,19 +285,34 @@ var fitScale = function() {
 
 			},
 
-			drop = function() {
+			drop = function(e) {
 
 				console.log("drop started");
 
-				get("p-zone").appendChild(card);
+				//check if card is above table
+				//make as separate function
+				var checkX = e.clientX > get("table").offsetLeft && e.clientX < get("table").offsetLeft + parseInt(getComputedStyle(get("table")).width),
+					checkY = e.clientY > get("table").offsetTop && e.clientY < get("table").offsetTop + parseInt(getComputedStyle(get("table")).height) ;
+
+				if (player.deck.onTable.length < 4 && checkX && checkY && !turn) {
+					get("p-zone").appendChild(card);
+					removeEvent(card, "mousedown", drag);
+					player.deck.onTable.push(player.deck.inHand.splice(player.deck.inHand.indexOf(card), 1)[0]);
+				} else {
+					get("p-hand").appendChild(card);
+					addEvent(e.target, "mouseover", zoom);
+					console.log("Can't put more than cards on the table right now");
+				}
+
 				card.style.height = "";
 				card.style.width = "";
 				card.style.position = "";
 				card.style.fontSize = "";
+				card.style.transition = "";
 
 				removeEvent(document, "mousemove", moveCard);
 				removeEvent(document, "mouseup", drop);
-				removeEvent(card, "mousedown", drag);
+				
 			};
 
 		initHeight = parseInt(getComputedStyle(card).height);
@@ -295,10 +330,29 @@ var fitScale = function() {
 		console.log(getComputedStyle(card).height);
 
 		card.style.position = "absolute";
-		card.style.transition = "0s";
 
 		addEvent(document, "mousemove", moveCard);
 		addEvent(document, "mouseup", drop);
+	},
+
+	attack = function() {
+
+	}
+
+	blockPlayer = function() {
+
+		player.deck.inHand.forEach(function(card) {
+			removeEvent(card, "mousedown", drag);
+		});
+
+		player.deck.onTable.forEach(function(card) {
+			removeEvent(card, "mousedown", attack);
+		});
+
+		var event = document.createEvent('Event');
+		event.initEvent('mouseup', true, true);
+		document.dispatchEvent(event);
+		removeEvent(get("next-turn"), "click", move);
 	};
 
 //run
