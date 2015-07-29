@@ -99,13 +99,14 @@ Deck.prototype.drawCards = function(n, turn) {
 				if (turn) {
 					get("p-hand").appendChild(card);
 					addEvent(mask, "mouseover", zoom);
+					addEvent(mask, "mouseout", zoom);
 				} else {
 					get("ai-hand").appendChild(card);
 				}
 
 				card.el = cardObj.el;
 				card.pow = pow;
-				card.mask = mask
+				card.mask = mask;
 				this.inHand.push(card);
 
 			} else {
@@ -123,11 +124,11 @@ var player = {
 	makeMove: function() {
 
 		this.deck.inHand.forEach(function(card) {
-			addEvent(card, "mousedown", drag);
+			addEvent(card.mask, "mousedown", drag);
 		});
 
 		this.deck.onTable.forEach(function(card) {
-			addEvent(card, "mousedown", attack);
+			addEvent(card.mask, "mousedown", attack);
 		});
 
 		addEvent(get("next-turn"), "click", move);
@@ -149,7 +150,7 @@ var ai = {
 					var card = ai.deck.inHand.splice(0, 1)[0];
 
 					get("ai-zone").appendChild(card);
-					ai.deck.onTable.push(ai.deck.inHand.splice(ai.deck.inHand.indexOf(card), 1)[0]);
+					ai.deck.onTable.push(card);
 
 				} else {
 					console.log("Can't put more than 4 cards on the table");
@@ -219,7 +220,6 @@ var init = function() {
 
 	move = function() {
 		//game turn
-
 		console.log("Next turn: " + turn);
 
 		blockPlayer();
@@ -264,8 +264,20 @@ var fitScale = function() {
 	},
 
 	zoom = function(e) {
-		e.target.parentNode.className += " card-zoomed";
-		addEvent(e.target, "mouseout", function(e) {e.target.parentNode.className = "card"});
+		var card = e.target.parentNode;
+		console.log(card.className);
+		if (card.className == "card card-zoomed" && e.type == "mouseout") {
+			card.className = "card";
+		} else if (card.className == "card" && e.type == "mouseover") {
+			card.className += " card-zoomed";
+		}
+	},
+
+	//checks if pointer is over the target
+	checkOver = function(e, target) {
+		var checkX = e.clientX > target.offsetLeft && e.clientX < target.offsetLeft + parseInt(getComputedStyle(target).width),
+			checkY = e.clientY > target.offsetTop && e.clientY < target.offsetTop + parseInt(getComputedStyle(target).height);
+		return checkX && checkY;
 	},
 
 	drag = function(e) {
@@ -289,18 +301,14 @@ var fitScale = function() {
 
 				console.log("drop started");
 
-				//check if card is above table
-				//make as separate function
-				var checkX = e.clientX > get("table").offsetLeft && e.clientX < get("table").offsetLeft + parseInt(getComputedStyle(get("table")).width),
-					checkY = e.clientY > get("table").offsetTop && e.clientY < get("table").offsetTop + parseInt(getComputedStyle(get("table")).height) ;
-
-				if (player.deck.onTable.length < 4 && checkX && checkY && !turn) {
+				if (player.deck.onTable.length < 4 && checkOver(e, get("table")) && !turn) {
 					get("p-zone").appendChild(card);
-					removeEvent(card, "mousedown", drag);
+					removeEvent(card.mask, "mousedown", drag);
 					player.deck.onTable.push(player.deck.inHand.splice(player.deck.inHand.indexOf(card), 1)[0]);
 				} else {
 					get("p-hand").appendChild(card);
-					addEvent(e.target, "mouseover", zoom);
+					addEvent(card.mask, "mouseover", zoom);
+					addEvent(card.mask, "mouseout", zoom);
 					console.log("Can't put more than cards on the table right now");
 				}
 
@@ -315,24 +323,27 @@ var fitScale = function() {
 				
 			};
 
-		initHeight = parseInt(getComputedStyle(card).height);
-		initWidth = parseInt(getComputedStyle(card).width);
+		if (card.className == "card card-zoomed") {
 
-		removeEvent(e.target, "mouseover", zoom);
-		removeEvent(e.target, "mouseout", function(e) {e.target.parentNode.className = "card"});
-		
-		card.style.transition = "0s";
-		card.className = "card";
-		card.style.height =	initHeight + "px";
-		card.style.width =	initWidth + "px";
-		card.style.fontSize = "2em";
-		moveCard(e);
-		console.log(getComputedStyle(card).height);
+			initHeight = parseInt(getComputedStyle(card).height);
+			initWidth = parseInt(getComputedStyle(card).width);
 
-		card.style.position = "absolute";
+			removeEvent(card.mask, "mouseover", zoom);
+			removeEvent(card.mask, "mouseout", zoom);
+			
+			card.style.transition = "0s";
+			card.className = "card";
+			card.style.height =	initHeight + "px";
+			card.style.width =	initWidth + "px";
+			card.style.fontSize = "2em";
+			moveCard(e);
+			console.log(getComputedStyle(card).height);
 
-		addEvent(document, "mousemove", moveCard);
-		addEvent(document, "mouseup", drop);
+			card.style.position = "absolute";
+
+			addEvent(document, "mousemove", moveCard);
+			addEvent(document, "mouseup", drop);
+		}
 	},
 
 	attack = function() {
