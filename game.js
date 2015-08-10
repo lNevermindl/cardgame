@@ -105,6 +105,7 @@ Deck.prototype.drawCards = function(n, turn) {
 				}
 
 				card.el = cardObj.el;
+				card.powStat = cardObj.pow;
 				card.pow = pow;
 				card.mask = mask;
 				this.inHand.push(card);
@@ -160,7 +161,7 @@ var ai = {
 
 			move();
 
-		}, 1000);
+		}, 2500);
 	}
 };
 
@@ -212,7 +213,12 @@ var init = function() {
 			if (count >= timeLimit){
 				move();
 			}
-			console.log(count);
+			if (turn) {
+				get("tip").childNodes[0].innerHTML = "AI turn" + "</br>" + count;
+			} else {
+				get("tip").childNodes[0].innerHTML = "Your turn" + "</br>" + count;
+			};
+			
 		}, 1000);
 
 		move();
@@ -228,11 +234,9 @@ var init = function() {
 		if (turn) {
 			player.deck.drawCards(1, turn);
 			player.makeMove();
-			get("tip").childNodes[0].innerHTML = "Your turn";
 		} else {
 			ai.deck.drawCards(1, turn);
 			ai.makeMove();
-			get("tip").childNodes[0].innerHTML = "AI turn";
 		}
 
 		turn = !turn;
@@ -346,9 +350,105 @@ var fitScale = function() {
 		}
 	},
 
-	attack = function() {
+	attack = function(e) {
 
-	}
+		var card = e.target.parentNode;
+			arrow = document.createElement("img"),
+			startCoords = {
+				x: card.offsetLeft + parseInt(getComputedStyle(card).width)/2,
+				y: card.offsetTop + parseInt(getComputedStyle(card).height)/2
+			};
+
+		var showArrow = function(e) {
+				arrow.style.top = e.clientY + "px";
+				arrow.style.height = startCoords.y - e.clientY + "px";
+
+				if ((e.clientX - startCoords.x) > 0 ) {
+					arrow.style.left = startCoords.x + "px";
+					arrow.style.WebkitTransform = "";
+					arrow.style.width = e.clientX - startCoords.x + "px";
+				} else {
+					arrow.style.left = e.clientX + "px";
+					arrow.style.WebkitTransform = "rotateY(180deg)";
+					arrow.style.width = startCoords.x - e.clientX + "px";
+				};
+			},
+
+			endAttack = function(e) {
+				document.body.removeChild(arrow);
+				ai.deck.onTable.forEach(function(aiCard) {
+					if (checkOver(e, aiCard.mask)) {
+						hitCreatures(card, aiCard);
+					};
+				});
+
+				removeEvent(card.mask, "mousedown", attack);
+				removeEvent(document, "mousemove", showArrow);
+				removeEvent(document, "mouseup", endAttack);
+			};
+
+		arrow.src = "images/arrow.png";
+		arrow.style.position = "absolute";
+		document.body.appendChild(arrow);
+		arrow.style.minWidth = parseInt(getComputedStyle(e.target).width)/3 + "px";
+
+		addEvent(document, "mousemove", showArrow);
+		addEvent(document, "mouseup", endAttack);
+
+	},
+
+	hitCreatures = function(source, target) {
+		var sourcePow = source.powStat,
+			targetPow = target.powStat,
+			sourceMpl = 1,
+			targetMpl = 1;
+
+		//need to check if splices correct
+		var hitCheck = function(card) {
+			if (card.powStat < 1) {
+				card.parentNode.removeChild(card);
+				var index = player.deck.onTable.indexOf(source);
+				if (index > -1) {
+					player.deck.onTable.splice(index, 1)[0];
+				} else {
+					ai.deck.onTable.splice(ai.deck.onTable.indexOf(source), 1)[0];
+				};
+			} else {
+				card.pow.innerHTML = card.powStat;
+			};
+		};
+
+		switch (source.el) {
+			case "water":
+				if (target.el === "fire") {
+					sourceMpl = 2;
+				} else if (target.el === "nature") {
+					targetMpl = 2;
+				};;
+				break;
+			case "fire":
+				if (target.el === "nature") {
+					sourceMpl = 2;
+				} else if (target.el === "water") {
+					targetMpl = 2;
+				};;
+				break;
+			case "nature":
+				if (target.el === "water") {
+					sourceMpl = 2;
+				} else if (target.el === "fire") {
+					targetMpl = 2;
+				};;
+				break;
+		}
+
+		source.powStat -= targetPow*targetMpl;
+		target.powStat -= sourcePow*sourceMpl;
+
+		hitCheck(source);
+		hitCheck(target);
+
+	},
 
 	blockPlayer = function() {
 

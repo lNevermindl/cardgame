@@ -149,7 +149,7 @@ body, #starting-screen, #board {
 }
 
 #table .card > div:nth-child(4) {
-	padding: 0 8%;
+	padding: 0 5%;
 	float: left;
 	height: 20%;
 	font-size: 1.8em;
